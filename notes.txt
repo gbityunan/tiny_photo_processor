@@ -1,0 +1,4 @@
+Submitting a message into a broker and writing new status into the db is not in transaction
+Moreover I am submitting multiple thumbnail requests before committing their status to the db. Therefore there is a possibility that thumbnail generation may proceed while the status will remain as 'pending' resulting in duplication of work. However for this specific case I would assume that that is better than to slow down the process by committing each status update to the database individually.
+
+No retries - I am also not using "publisher confirms" to avoid slowing down handling of this request and because presence of thumbnails is likely not critical. There is a concern that submitting such request through an endpoint may result in a timeout if a large number of unprocessed photos exists or if for example we manually flagged all photos as pending in order to regenerate all thumbnails. One way to overcome this is to limit how many photos we process during one call.
